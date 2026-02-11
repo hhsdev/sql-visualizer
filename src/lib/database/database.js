@@ -1,10 +1,11 @@
 import initSqlJs from 'sql.js';
 import { store } from './store.svelte.js';
+import { base } from '$app/paths';
 
 
 export const dbInit = async () => {
 	const SQL = await initSqlJs({
-		locateFile: (file) => `/${file}`
+		locateFile: (file) => `${base}/${file}`
 	});
 	store.db = new SQL.Database();
 };

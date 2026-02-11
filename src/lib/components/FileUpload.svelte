@@ -1,5 +1,6 @@
 <script>
 	import IconUpload from '~icons/mdi/file-upload';
+	import { base } from '$app/paths';
 	import initSqlJs from 'sql.js';
 	import { store } from '$lib/database/store.svelte';
 	import { fetchTables } from '$lib/database/database';
@@ -38,7 +39,7 @@
 		reader.onload = async (event) => {
 			const Uints = new Uint8Array(event.target.result);
 			const SQL = await initSqlJs({
-				locateFile: (file) => `/${file}`
+				locateFile: (file) => `${base}/${file}`
 			});
 			store.db = new SQL.Database(Uints);
 			const tables = fetchTables();
