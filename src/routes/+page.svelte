@@ -2,8 +2,8 @@
 	import DbTable from '$lib/components/DbTable.svelte';
 	import Editor from '$lib/components/Editor.svelte';
 	import FileUpload from '$lib/components/FileUpload.svelte';
-	import { dbCommand, getTableSchema } from '$lib/assets/database/database';
-	import { store } from '$lib/assets/database/store.svelte';
+	import { dbCommand, getTableSchema } from '$lib/database/database';
+	import { store } from '$lib/database/store.svelte';
 
 	const runSqlCommand = () => {
 		const sqlCommand = document.getElementById('sql-command').value;

@@ -1,8 +1,8 @@
 <script>
 	import IconUpload from '~icons/mdi/file-upload';
 	import initSqlJs from 'sql.js';
-	import { store } from '$lib/assets/database/store.svelte';
-	import { fetchTables } from '$lib/assets/database/database';
+	import { store } from '$lib/database/store.svelte';
+	import { fetchTables } from '$lib/database/database';
 
 	let files = $state(null);
 

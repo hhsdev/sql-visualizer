@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
-	import { dbInit, fetchTables } from '../assets/database/database';
-	import { store } from '../assets/database/store.svelte';
+	import { dbInit, fetchTables } from '$lib/database/database.js';
+	import { store } from '$lib/database/store.svelte.js';
 
 	onMount(async () => {
 		await dbInit();
