@@ -1,2 +1,20 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
+
+@import 'highlight.js/styles/atom-one-dark.css';
+
+:root {
+    --color-primary: #1e40af;
+    --color-secondary: #3b82f6;
+    --color-background: #eaeaea;
+    --color-text: #111827;
+
+    --color-gray: #6b7280;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-text);
+}
