@@ -7,7 +7,7 @@
 	let codeBlock = null;
 	let textArea = null;
 
-	let code = $state('');
+	let { code = $bindable('') } = $props();
 
 	$effect(() => {
 		if (codeBlock) {

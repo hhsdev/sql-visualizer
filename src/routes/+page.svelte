@@ -4,10 +4,18 @@
 	import FileUpload from '$lib/components/FileUpload.svelte';
 	import { dbCommand, getTableSchema } from '$lib/database/database';
 	import { store } from '$lib/database/store.svelte';
+	import IconLeftArrow from '~icons/mdi/menu-left';
+	import IconRightArrow from '~icons/mdi/menu-right';
+
+	let command = $state('');
+	let prevDisabled = $derived(store.commandHistoryIndex <= 0);
+	let nextDisabled = $derived(store.commandHistoryIndex >= store.commandHistory.length - 1);
 
 	const runSqlCommand = () => {
 		const sqlCommand = document.getElementById('sql-command').value;
 		dbCommand(sqlCommand);
+		store.commandHistory = [...store.commandHistory, sqlCommand];
+		store.commandHistoryIndex = store.commandHistory.length - 1;
 	};
 
 	const displayTable = (tableName) => {
@@ -23,19 +31,46 @@
 	const showTableInfo = (tableName) => {
 		store.selectedTable = getTableSchema(tableName);
 	};
+
+	const prevCommand = () => {
+		if (store.commandHistoryIndex <= 0) return;
+		store.commandHistoryIndex = store.commandHistoryIndex - 1;
+		command = store.commandHistory[store.commandHistoryIndex];
+	}
+
+	const nextCommand = () => {
+		if (store.commandHistoryIndex >= (store.commandHistory.length - 1))
+			return;
+		store.commandHistoryIndex = store.commandHistoryIndex + 1;
+		command = store.commandHistory[store.commandHistoryIndex];
+	}
 </script>
 
 <main class="main-panel">
 	<div class="import-control"><FileUpload /></div>
 	<div class="panel command flex flex-col">
 		<h2>SQL Command</h2>
-		<Editor />
-		<button
-			class="mt-2 w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700"
-			on:click={runSqlCommand}
-		>
-			Run SQL Command
-		</button>
+		<Editor bind:code={command} />
+		<div class="flex gap-2">
+			<button
+				class="mt-2 rounded-full bg-blue-500 px-2 py-2 text-white hover:bg-blue-700 text-2xl {prevDisabled ? 'btn-disabled' : ''}"
+				onclick={prevCommand}
+			>
+				<IconLeftArrow />
+			</button>
+			<button
+				class="mt-2 rounded-full bg-blue-500 px-2 py-2 text-white hover:bg-blue-700 text-2xl {nextDisabled ? 'btn-disabled' : ''}"
+				onclick={nextCommand}
+			>
+				<IconRightArrow />
+			</button>
+			<button
+				class="mt-2 w-auto rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700 grow"
+				onclick={runSqlCommand}
+			>
+				Run SQL Command
+			</button>
+		</div>
 	</div>
 	<div class="panel visual-table">
 		<h2>Database</h2>
@@ -46,9 +81,9 @@
 		<ul>
 			{#each store.tableList as table}
 				<li>
-					<button class="table-list__item" on:click={() => displayTable(table)}>{table}</button>
-					<button class="table-list__item" on:click={() => deleteTable(table)}>[x]</button>
-					<button class="table-list__item" on:click={() => showTableInfo(table)}>[info]</button>
+					<button class="table-list__item" onclick={() => displayTable(table)}>{table}</button>
+					<button class="table-list__item" onclick={() => deleteTable(table)}>[x]</button>
+					<button class="table-list__item" onclick={() => showTableInfo(table)}>[info]</button>
 				</li>
 			{/each}
 		</ul>
@@ -115,5 +150,10 @@
 		padding: 16px;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 		overflow: scroll;
+	}
+
+	.btn-disabled {
+		background-color: gray;
+		cursor: not-allowed;
 	}
 </style>
