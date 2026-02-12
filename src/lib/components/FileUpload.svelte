@@ -78,16 +78,12 @@
 	/>
 
 	<div class="content">
-		{#if files}
-			<p class="success">📄 {files[0].name} is loaded!</p>
-		{:else}
-			<div class="align-center flex flex-col justify-center">
-				<div class="icon">
-					<IconUpload style="font-size: 2rem;" />
-				</div>
-				<p>Drop SQLite file here or <span class="highlight">click to browse</span></p>
+		<div class="align-center flex flex-col justify-center">
+			<div class="icon">
+				<IconUpload style="font-size: 2rem;" />
 			</div>
-		{/if}
+			<p>Drop SQLite file here or <span class="highlight">click to browse</span></p>
+		</div>
 	</div>
 </div>
 
@@ -134,10 +130,5 @@
 		color: #3b82f6;
 		font-weight: 500;
 		text-decoration: underline;
-	}
-
-	.success {
-		color: #4ade80; /* Green */
-		font-weight: bold;
 	}
 </style>
