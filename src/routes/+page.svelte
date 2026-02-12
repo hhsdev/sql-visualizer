@@ -98,17 +98,28 @@
 </main>
 
 <style>
+
 	.main-panel {
 		padding: 0 16px;
 		margin-top: 16px;
 		display: grid;
-		min-height: 90vh;
-		grid-template-areas:
-			'import import import'
-			'command table table-list';
-		grid-template-rows: auto 1fr;
-		grid-template-columns: 40% 1fr auto;
+		grid-template-areas: 
+			'import'
+			'command'
+			'table-list'
+			'table';
 		gap: 16px;
+	}
+
+	@media (min-width: 1024px) {
+		.main-panel {
+			min-height: 90vh;
+			grid-template-areas:
+				'import import import'
+				'command table table-list';
+			grid-template-rows: auto 1fr;
+			grid-template-columns: 40% 1fr auto;
+		}
 	}
 
 	.import-control {

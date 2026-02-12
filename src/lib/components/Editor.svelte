@@ -40,6 +40,7 @@
 		width: 100%;
 		position: relative;
 		border-radius: 8px;
+		min-height: 300px;
 	}
 
 	#sql-command {
