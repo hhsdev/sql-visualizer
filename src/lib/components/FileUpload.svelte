@@ -4,6 +4,7 @@
 	import initSqlJs from 'sql.js';
 	import { store } from '$lib/database/store.svelte';
 	import { fetchTables } from '$lib/database/database';
+	import { notification } from '$lib/notification.svelte';
 
 	let files = $state(null);
 
@@ -46,6 +47,7 @@
 			store.tableList = tables;
 		};
 		reader.readAsArrayBuffer(files[0]);
+		notification.show(`Database "${files[0].name}" loaded successfully!`, 'info');
 	};
 
 	const handleChange = (e) => {

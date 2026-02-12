@@ -3,9 +3,12 @@
 	import Editor from '$lib/components/Editor.svelte';
 	import FileUpload from '$lib/components/FileUpload.svelte';
 	import { dbCommand, getTableSchema } from '$lib/database/database';
+	import { notification } from '$lib/notification.svelte';
 	import { store } from '$lib/database/store.svelte';
 	import IconLeftArrow from '~icons/mdi/menu-left';
 	import IconRightArrow from '~icons/mdi/menu-right';
+	import IconDelete from '~icons/mdi/delete';
+	import IconInfo from '~icons/mdi/info';
 
 	let command = $state('');
 	let prevDisabled = $derived(store.commandHistoryIndex <= 0);
@@ -13,7 +16,11 @@
 
 	const runSqlCommand = () => {
 		const sqlCommand = document.getElementById('sql-command').value;
-		dbCommand(sqlCommand);
+		try {
+			dbCommand(sqlCommand);
+		} catch (err) {
+			notification.show(err.message);
+		}
 		store.commandHistory = [...store.commandHistory, sqlCommand];
 		store.commandHistoryIndex = store.commandHistory.length - 1;
 	};
@@ -80,10 +87,10 @@
 		<h2>Tables</h2>
 		<ul>
 			{#each store.tableList as table}
-				<li>
-					<button class="table-list__item" onclick={() => displayTable(table)}>{table}</button>
-					<button class="table-list__item" onclick={() => deleteTable(table)}>[x]</button>
-					<button class="table-list__item" onclick={() => showTableInfo(table)}>[info]</button>
+				<li class="flex align-center gap-2">
+					<button class="table-list__item hover:text-blue-500 grow text-left" onclick={() => displayTable(table)}>{table}</button>
+					<button class="table-list__item text-gray-500 hover:text-red-500" onclick={() => deleteTable(table)}><IconDelete /></button>
+					<button class="table-list__item text-gray-500 hover:text-green-500" onclick={() => showTableInfo(table)}><IconInfo /></button>
 				</li>
 			{/each}
 		</ul>
@@ -113,9 +120,8 @@
 		max-height: 80vh;
 	}
 
-	.command > h2,
-	.visual-table > h2 {
-		margin: 8px 0 4px 2px;
+	.panel > h2 {
+		margin-bottom: 8px;
 		font-weight: bold;
 	}
 
@@ -136,7 +142,6 @@
 
 	.table-list__item:hover {
 		cursor: pointer;
-		color: blue;
 	}
 
 	.table-list > h2 {
