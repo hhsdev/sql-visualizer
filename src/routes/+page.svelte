@@ -53,6 +53,10 @@
 	};
 </script>
 
+<svelte:head>
+	<title>SQL Playground</title>
+</svelte:head>
+
 <main class="main-panel">
 	<div class="import-control"><FileUpload /></div>
 	<div class="panel command flex flex-col">
