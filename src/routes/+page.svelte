@@ -2,13 +2,14 @@
 	import DbTable from '$lib/components/DbTable.svelte';
 	import Editor from '$lib/components/Editor.svelte';
 	import FileUpload from '$lib/components/FileUpload.svelte';
-	import { dbCommand, getTableSchema } from '$lib/database/database';
+	import { dbCommand, exportDatabase, getTableSchema } from '$lib/database/database';
 	import { notification } from '$lib/notification.svelte';
 	import { store } from '$lib/database/store.svelte';
 	import IconLeftArrow from '~icons/mdi/menu-left';
 	import IconRightArrow from '~icons/mdi/menu-right';
 	import IconDelete from '~icons/mdi/delete';
 	import IconInfo from '~icons/mdi/info';
+	import IconExport from '~icons/mdi/download';
 
 	let command = $state('');
 	let prevDisabled = $derived(store.commandHistoryIndex <= 0);
@@ -43,14 +44,13 @@
 		if (store.commandHistoryIndex <= 0) return;
 		store.commandHistoryIndex = store.commandHistoryIndex - 1;
 		command = store.commandHistory[store.commandHistoryIndex];
-	}
+	};
 
 	const nextCommand = () => {
-		if (store.commandHistoryIndex >= (store.commandHistory.length - 1))
-			return;
+		if (store.commandHistoryIndex >= store.commandHistory.length - 1) return;
 		store.commandHistoryIndex = store.commandHistoryIndex + 1;
 		command = store.commandHistory[store.commandHistoryIndex];
-	}
+	};
 </script>
 
 <main class="main-panel">
@@ -60,19 +60,23 @@
 		<Editor bind:code={command} />
 		<div class="flex gap-2">
 			<button
-				class="mt-2 rounded-full bg-blue-500 px-2 py-2 text-white hover:bg-blue-700 text-2xl {prevDisabled ? 'btn-disabled' : ''}"
+				class="mt-2 rounded-full bg-blue-500 px-2 py-2 text-2xl text-white hover:bg-blue-700 {prevDisabled
+					? 'btn-disabled'
+					: ''}"
 				onclick={prevCommand}
 			>
 				<IconLeftArrow />
 			</button>
 			<button
-				class="mt-2 rounded-full bg-blue-500 px-2 py-2 text-white hover:bg-blue-700 text-2xl {nextDisabled ? 'btn-disabled' : ''}"
+				class="mt-2 rounded-full bg-blue-500 px-2 py-2 text-2xl text-white hover:bg-blue-700 {nextDisabled
+					? 'btn-disabled'
+					: ''}"
 				onclick={nextCommand}
 			>
 				<IconRightArrow />
 			</button>
 			<button
-				class="mt-2 w-auto rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700 grow"
+				class="mt-2 w-auto grow rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700"
 				onclick={runSqlCommand}
 			>
 				Run SQL Command
@@ -87,23 +91,37 @@
 		<h2>Tables</h2>
 		<ul>
 			{#each store.tableList as table}
-				<li class="flex align-center gap-2">
-					<button class="table-list__item hover:text-blue-500 grow text-left" onclick={() => displayTable(table)}>{table}</button>
-					<button class="table-list__item text-gray-500 hover:text-red-500" onclick={() => deleteTable(table)}><IconDelete /></button>
-					<button class="table-list__item text-gray-500 hover:text-green-500" onclick={() => showTableInfo(table)}><IconInfo /></button>
+				<li class="align-center flex gap-2">
+					<button
+						class="table-list__item grow text-left hover:text-blue-500"
+						onclick={() => displayTable(table)}>{table}</button
+					>
+					<button
+						class="table-list__item text-gray-500 hover:text-red-500"
+						onclick={() => deleteTable(table)}><IconDelete /></button
+					>
+					<button
+						class="table-list__item text-gray-500 hover:text-green-500"
+						onclick={() => showTableInfo(table)}><IconInfo /></button
+					>
 				</li>
 			{/each}
 		</ul>
+		<button
+			class="mt-4 w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700"
+			onclick={exportDatabase}
+		>
+			<IconExport class="inline" /> Export Database
+		</button>
 	</div>
 </main>
 
 <style>
-
 	.main-panel {
 		padding: 0 16px;
 		margin-top: 16px;
 		display: grid;
-		grid-template-areas: 
+		grid-template-areas:
 			'import'
 			'command'
 			'table-list'
@@ -128,7 +146,6 @@
 
 	.command {
 		grid-area: command;
-		max-height: 80vh;
 	}
 
 	.panel > h2 {
@@ -142,7 +159,7 @@
 	}
 
 	.table-list {
-		min-width: 150px;
+		min-width: 200px;
 		height: 100%;
 	}
 
@@ -166,6 +183,7 @@
 		padding: 16px;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 		overflow: scroll;
+		max-height: 75vh;
 	}
 
 	.btn-disabled {

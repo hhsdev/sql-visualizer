@@ -96,3 +96,28 @@ const getFromTable = (tableName) => {
 		rows: result
 	};
 };
+
+const saveArrayToDisk = (data, fileName) => {
+    const blob = new Blob([data], { type: 'application/octet-stream' });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+	link.style.display = 'none';
+	link.style.visibility = 'hidden';
+
+    link.href = url;
+    link.download = fileName;
+
+    // 4. Trigger the download by "clicking" the link
+    document.body.appendChild(link);
+    link.click();
+
+    // 5. Cleanup: remove the link and revoke the URL to free memory
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+}
+
+export const exportDatabase = () => {
+	const data = store.db.export();
+	saveArrayToDisk(data, 'database.sqlite');
+};
