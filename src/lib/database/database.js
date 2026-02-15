@@ -2,7 +2,6 @@ import initSqlJs from 'sql.js';
 import { store } from './store.svelte.js';
 import { base } from '$app/paths';
 
-
 export const dbInit = async () => {
 	const SQL = await initSqlJs({
 		locateFile: (file) => `${base}/${file}`
@@ -98,26 +97,35 @@ const getFromTable = (tableName) => {
 };
 
 const saveArrayToDisk = (data, fileName) => {
-    const blob = new Blob([data], { type: 'application/octet-stream' });
-    const url = window.URL.createObjectURL(blob);
+	const blob = new Blob([data], { type: 'application/octet-stream' });
+	const url = window.URL.createObjectURL(blob);
 
-    const link = document.createElement('a');
+	const link = document.createElement('a');
 	link.style.display = 'none';
 	link.style.visibility = 'hidden';
 
-    link.href = url;
-    link.download = fileName;
+	link.href = url;
+	link.download = fileName;
 
-    // 4. Trigger the download by "clicking" the link
-    document.body.appendChild(link);
-    link.click();
+	// 4. Trigger the download by "clicking" the link
+	document.body.appendChild(link);
+	link.click();
 
-    // 5. Cleanup: remove the link and revoke the URL to free memory
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-}
+	// 5. Cleanup: remove the link and revoke the URL to free memory
+	document.body.removeChild(link);
+	window.URL.revokeObjectURL(url);
+};
 
 export const exportDatabase = () => {
 	const data = store.db.export();
 	saveArrayToDisk(data, 'database.sqlite');
+};
+
+export const getTableDimensions = (tableName) => {
+	const stmt = store.db.prepare(`SELECT COUNT(*) as count FROM '${tableName}'`);
+	const numRows = stmt.step() ? stmt.get()[0] : 0;
+
+	const columnInfo= store.db.exec(`PRAGMA table_info('${tableName}')`);
+	const numCols = columnInfo.length > 0 ? columnInfo[0].values.length : 0;
+	return { rows: numRows, columns: numCols };
 };

@@ -2,18 +2,35 @@
 	import DbTable from '$lib/components/DbTable.svelte';
 	import Editor from '$lib/components/Editor.svelte';
 	import FileUpload from '$lib/components/FileUpload.svelte';
-	import { dbCommand, exportDatabase, getTableSchema } from '$lib/database/database';
+	import {
+		dbCommand,
+		exportDatabase,
+		getTableDimensions
+	} from '$lib/database/database';
 	import { notification } from '$lib/notification.svelte';
 	import { store } from '$lib/database/store.svelte';
 	import IconLeftArrow from '~icons/mdi/menu-left';
 	import IconRightArrow from '~icons/mdi/menu-right';
-	import IconDelete from '~icons/mdi/delete';
-	import IconInfo from '~icons/mdi/info';
 	import IconExport from '~icons/mdi/download';
+	import TableTitleItem from '$lib/components/TableTitleItem.svelte';
 
 	let command = $state('');
 	let prevDisabled = $derived(store.commandHistoryIndex <= 0);
 	let nextDisabled = $derived(store.commandHistoryIndex >= store.commandHistory.length - 1);
+
+	let dbInfo = $state([]);
+
+	const updateDbInfo = () => {
+		const result = [];
+		let i = 0;
+		for (const table of store.tableList) {
+			const dimensions = getTableDimensions(table);
+			result.push({ id: i++, name: table, ...dimensions });
+		}
+		dbInfo = result;
+	};
+
+	$effect(updateDbInfo);
 
 	const runSqlCommand = () => {
 		const sqlCommand = document.getElementById('sql-command').value;
@@ -24,20 +41,6 @@
 		}
 		store.commandHistory = [...store.commandHistory, sqlCommand];
 		store.commandHistoryIndex = store.commandHistory.length - 1;
-	};
-
-	const displayTable = (tableName) => {
-		const sqlCommand = `SELECT * FROM ${tableName};`;
-		dbCommand(sqlCommand);
-	};
-
-	const deleteTable = (tableName) => {
-		const sqlCommand = `DROP TABLE ${tableName};`;
-		dbCommand(sqlCommand);
-	};
-
-	const showTableInfo = (tableName) => {
-		store.selectedTable = getTableSchema(tableName);
 	};
 
 	const prevCommand = () => {
@@ -94,21 +97,8 @@
 	<div class="panel table-list">
 		<h2>Tables</h2>
 		<ul>
-			{#each store.tableList as table}
-				<li class="align-center flex gap-2">
-					<button
-						class="table-list__item grow text-left hover:text-blue-500"
-						onclick={() => displayTable(table)}>{table}</button
-					>
-					<button
-						class="table-list__item text-gray-500 hover:text-red-500"
-						onclick={() => deleteTable(table)}><IconDelete /></button
-					>
-					<button
-						class="table-list__item text-gray-500 hover:text-green-500"
-						onclick={() => showTableInfo(table)}><IconInfo /></button
-					>
-				</li>
+			{#each dbInfo as table (table.id)}
+				<TableTitleItem {table} />
 			{/each}
 		</ul>
 		<button
@@ -165,15 +155,6 @@
 	.table-list {
 		min-width: 200px;
 		height: 100%;
-	}
-
-	.table-list__item {
-		padding: 4px 0;
-		text-decoration: dotted underline;
-	}
-
-	.table-list__item:hover {
-		cursor: pointer;
 	}
 
 	.table-list > h2 {
